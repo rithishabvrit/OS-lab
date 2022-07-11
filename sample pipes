@@ -1,0 +1,26 @@
+/ sample pipes // 
+#include<stdio.h>
+#include<unistd.h>
+
+int main() {
+   int pipefds[2],returnstatus;
+
+   char write_messages[2][20]={"cat", "meow"};
+   char read_messages[20];
+   returnstatus = pipe(pipefds);
+
+   if (returnstatus == -1) {
+      printf("Unable to create pipe\n");
+      return 1;
+   }
+
+   printf("Writing to pipe %s\n", write_messages[0]);
+   write(pipefds[1], write_messages[0], sizeof(write_messages[0]));
+   read(pipefds[0], read_messages, sizeof(read_messages));
+   printf("Reading from pipe %s\n", read_messages);
+   printf("Writing from pipe %s\n", write_messages[1]);
+   write(pipefds[1], write_messages[1], sizeof(write_messages[1]));
+   read(pipefds[0], read_messages, sizeof(read_messages));
+   printf("Reading from pipe %s\n", read_messages);
+   return 0;
+   }
