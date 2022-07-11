@@ -1,0 +1,42 @@
+#include<stdio.h>
+#include<unistd.h>
+
+int main() {
+   int pipefds1[2], pipefds2[2];
+   int returnstatus1, returnstatus2;
+   int pid;
+   char pipe1write_message[20] = "animal";
+   char pipe2write_message[20] = "tiger";
+   char read_message[20];
+   returnstatus1 = pipe(pipefds1);
+
+   if (returnstatus1 == -1) {
+      printf("Unable to create pipe 1 \n");
+      return 1;
+   }
+   returnstatus2 = pipe(pipefds2);
+
+   if (returnstatus2 == -1) {
+      printf("Unable to create pipe 2 \n");
+      return 1;
+   }
+   pid = fork();
+
+   if (pid != 0) {
+      close(pipefds1[0]);
+      close(pipefds2[1]);
+      printf("In Parent: Writing to pipe %s\n", pipe1write_message);
+      write(pipefds1[1], pipe1write_message, sizeof(pipe1write_message));
+      read(pipefds2[0], read_message, sizeof(read_message));
+      printf("In Parent: Reading from pipe %s\n", read_message);
+   }
+    else{
+      close(pipefds1[1]);
+      close(pipefds2[0]);
+      read(pipefds1[0], read_message, sizeof(read_message));
+      printf("In Child: Reading from pipe %s\n", read_message);
+      printf("In Child: Writing to pipe %s\n", pipe2write_message);
+      write(pipefds2[1], pipe2write_message, sizeof(pipe2write_message));
+      }
+   return 0;
+   }
